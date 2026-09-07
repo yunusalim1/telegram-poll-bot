@@ -1,0 +1,24 @@
+name: Monthly Verdişlər Statistics
+
+on:
+  schedule:
+    # Hər ayın 1-i, saat 08:10 Bakı vaxtı (UTC+4) = 04:10 UTC
+    - cron: '10 4 1 * *'
+  workflow_dispatch: {}
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+
+      - run: python monthly_stats.py
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
