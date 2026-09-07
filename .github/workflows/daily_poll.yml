@@ -4,7 +4,10 @@ on:
   schedule:
     # Hər gün saat 08:00 Bakı vaxtı (UTC+4) = 04:00 UTC
     - cron: '0 4 * * *'
-  workflow_dispatch: {}   # istəsən əl ilə də işə sala bilərsən
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
 
 jobs:
   send-poll:
@@ -16,9 +19,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install requests
+      - run: pip install -r requirements.txt
 
       - run: python send_poll.py
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+
+      - name: Commit poll log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add polls_log.csv
+          git diff --staged --quiet || git commit -m "Log daily poll"
+          git push
